@@ -23,6 +23,22 @@ stages:
             COPY files/scripts/install-overpass-nerd.sh /tmp/install-overpass-nerd.sh
             RUN bash /tmp/install-overpass-nerd.sh
 
+  # Terra's nightly bot bumps only rawhide, so its F44 umbriel-nightly lags.
+  # Rebuild the rawhide SRPM for F44; the main image keeps Terra's F44 build
+  # whenever this stage produces nothing.
+  - name: umbriel-builder
+    from: registry.fedoraproject.org/fedora:44
+    modules:
+      - type: containerfile
+        snippets:
+          - |
+            # Remote ADDs are fetched every build, so a new Terra snapshot or
+            # Fedora update (wlroots) invalidates the cached rebuild.
+            ADD https://repos.fyralabs.com/terrarawhide-source/repodata/repomd.xml /tmp/cache-keys/terra.xml
+            ADD https://dl.fedoraproject.org/pub/fedora/linux/updates/44/Everything/x86_64/repodata/repomd.xml /tmp/cache-keys/fedora.xml
+            COPY files/scripts/rebuild-umbriel-nightly.sh /tmp/rebuild-umbriel-nightly.sh
+            RUN bash /tmp/rebuild-umbriel-nightly.sh /out
+
 modules:
   # Fresh mutable RPM inputs on every build (including scheduled builds).
   # Only the isolated, pinned theme/font stage uses persistent cache hits.
@@ -86,6 +102,17 @@ modules:
         - stow
         - yazi
         - starship
+
+  # Prefer the F44 rebuild of Terra's rawhide snapshot while Terra is enabled
+  # to resolve its dependencies.
+  - type: copy
+    from: umbriel-builder
+    src: /out
+    dest: /tmp/umbriel-rebuild
+
+  - type: script
+    scripts:
+      - install-rebuilt-umbriel.sh
 
   # Smile ships only on Flathub, so install it for each new user.
   - type: default-flatpaks
