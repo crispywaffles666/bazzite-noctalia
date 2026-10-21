@@ -1,7 +1,7 @@
 # Starter configuration for bazzite-noctalia. Umbriel's native session starts
 # through /usr/share/wayland-sessions/umbriel.desktop (Exec=start-umbriel).
 [general]
-autostart = ["noctalia", "$HOME/.local/bin/screenshot-notify.sh"]
+autostart = ["noctalia", "$HOME/.local/bin/screenshot-notify.sh", "$HOME/.local/bin/umbriel-auto-fullwidth.py"]
 xwayland = true
 xwayland_native_resolution = true
 show_cheatsheet = false
@@ -27,6 +27,9 @@ radius = 3
 [colors.border]
 focused = "#bd93f9"
 unfocused = "#44475a"
+
+[colors.overview]
+background_tint = "#44475a"
 
 [layout]
 mode = "scrolling"
@@ -76,6 +79,28 @@ size = 24
 enabled = true
 action = "overview-toggle"
 
+# Breezy's display identities and positions mirror the Niri dotfiles. An
+# unmatched monitor still uses Umbriel's automatic preferred-mode layout.
+[output."HP Inc. HP Z27q G3 CN41170Z70"]
+mode = "2560x1440@59.951"
+position = [0, 184]
+scale = 1.0
+focus_at_startup = true
+workspaces = ["1", "2", "3"]
+
+[output."HP Inc. HP Z27q G3 CN41170Z70".layout.scrolling]
+default_extent_fraction = 0.5
+
+[output."HP Inc. HP Z24n G3 CN41254B6B"]
+mode = "1920x1200@59.950"
+position = [2560, 0]
+transform = "270"
+scale = 1.0
+workspaces = ["4", "5"]
+
+[output."HP Inc. HP Z24n G3 CN41254B6B".layout.scrolling]
+default_extent_fraction = 1.0
+
 # Umbriel chooses the preferred mode on each connected display. Set per-output
 # VRR and HDR only after confirming the output and GPU support:
 # [output.DP-1]
@@ -93,7 +118,7 @@ action = "overview-toggle"
 "Mod+Alt+L" = "spawn:loginctl lock-session"
 "Mod+Space" = { action = "overview-toggle", repeat = false }
 "Mod+S" = "spawn:noctalia msg panel-toggle launcher"
-"Alt+Space" = "overview-toggle"
+"Alt+Space" = "spawn:noctalia msg panel-toggle launcher"
 "Mod+O" = "overview-toggle"
 "Mod+F" = "window-toggle-fullscreen"
 "Mod+T" = "window-toggle-floating"
@@ -141,6 +166,8 @@ action = "overview-toggle"
 "Mod+Ctrl+Shift+WheelDown" = "column-move-right"
 "Mod+Tab" = "workspace-focus-last"
 "Mod+Ctrl+F" = "window-toggle-maximize"
+"Mod+BracketLeft" = "window-consume-or-expel-left"
+"Mod+BracketRight" = "window-consume-or-expel-right"
 "Mod+Minus" = "window-modify-primary-extent:-0.1"
 "Mod+Equal" = "window-modify-primary-extent:+0.1"
 "Mod+Shift+Minus" = "window-modify-secondary-extent:-0.1"
@@ -164,20 +191,20 @@ action = "overview-toggle"
 "Ctrl+Alt+Delete" = "session-quit"
 "Mod+Shift+P" = "dpms-off"
 
-"Mod+1" = "workspace-switch:1"
-"Mod+2" = "workspace-switch:2"
-"Mod+3" = "workspace-switch:3"
-"Mod+4" = "workspace-switch:4"
-"Mod+5" = "workspace-switch:5"
+"Mod+1" = 'workspace-switch:"1"/DP-4'
+"Mod+2" = 'workspace-switch:"2"/DP-4'
+"Mod+3" = 'workspace-switch:"3"/DP-4'
+"Mod+4" = 'workspace-switch:"4"/DP-3'
+"Mod+5" = 'workspace-switch:"5"/DP-3'
 "Mod+6" = "workspace-switch:6"
 "Mod+7" = "workspace-switch:7"
 "Mod+8" = "workspace-switch:8"
 "Mod+9" = "workspace-switch:9"
-"Mod+Ctrl+1" = "column-move-to-workspace:1"
-"Mod+Ctrl+2" = "column-move-to-workspace:2"
-"Mod+Ctrl+3" = "column-move-to-workspace:3"
-"Mod+Ctrl+4" = "column-move-to-workspace:4"
-"Mod+Ctrl+5" = "column-move-to-workspace:5"
+"Mod+Ctrl+1" = 'column-move-to-workspace:"1"/DP-4'
+"Mod+Ctrl+2" = 'column-move-to-workspace:"2"/DP-4'
+"Mod+Ctrl+3" = 'column-move-to-workspace:"3"/DP-4'
+"Mod+Ctrl+4" = 'column-move-to-workspace:"4"/DP-3'
+"Mod+Ctrl+5" = 'column-move-to-workspace:"5"/DP-3'
 "Mod+Ctrl+6" = "column-move-to-workspace:6"
 "Mod+Ctrl+7" = "column-move-to-workspace:7"
 "Mod+Ctrl+8" = "column-move-to-workspace:8"
@@ -186,7 +213,7 @@ action = "overview-toggle"
 [[window_rule]]
 match.app_id = "^dev.noctalia.Noctalia$"
 default_floating = true
-default_floating_size_px = { width = 1020, height = 900 }
+default_floating_size_px = { width = 1080, height = 920 }
 
 [[window_rule]]
 match.app_id = "^dev.noctalia.UmbrielSharePicker$"
@@ -205,7 +232,16 @@ default_position = { x = 10, y = 10, anchor = "bottom_right" }
 default_focused = false
 
 [[window_rule]]
-match.app_id = "^(it.mijorus.smile|satty)$"
+match.app_id = "([Gg]radia|[Ss]atty|it[.]mijorus[.]smile)"
+default_floating = true
+
+[[window_rule]]
+match.app_id = "^hearthstone[.]exe$"
+default_floating = true
+default_maximize = true
+
+[[window_rule]]
+match.app_id = "^(hearthstonedecktracker|explorer)[.]exe$"
 default_floating = true
 
 [[layer_rule]]

@@ -15,13 +15,17 @@ The Terra RPM supplies `/usr/share/wayland-sessions/umbriel.desktop` with `Exec=
 
 Noctalia's [starter config](files/system/etc/skel/.config/noctalia/config.toml) keeps the source image's shell look and functionality. Noctalia handles screenshots and saves them to `~/Pictures/Screenshots`. The included app configs and helper scripts are otherwise inherited from `bazzite-niri`.
 
-Umbriel selects each display's preferred mode. VRR and HDR require supported hardware and are opt-in per output in the Umbriel config. See the commented `[output.DP-1]` example and [Umbriel's output documentation](https://docs.noctalia.dev/umbriel/outputs/). Fullscreen, direct scanout, multi-monitor placement, and native Xwayland use Umbriel's own implementation. Screen sharing uses the Umbriel portal.
+The Umbriel config matches Breezy's Niri monitor layout: Z27q G3 at 2560×1440, Z24n G3 rotated 270° at 1920×1200, both at scale 1, with named workspaces 1–3 and 4–5 respectively. Other monitors use Umbriel's defaults. The [column-width helper](files/system/etc/skel/.local/bin/umbriel-auto-fullwidth.py) uses [output-widths.json](files/system/etc/skel/.config/umbriel/output-widths.json) to restore 50% width on the main display or full width on the portrait display when a tiled column crosses outputs.
+
+`Mod+Space` opens Umbriel's overview. `Alt+Space` and `Mod+S` open Noctalia's launcher directly. Terra currently ships Noctalia 5.0.0-beta.9, which does not support typing in Umbriel's overview to open the launcher; upstream added that in 5.2.0.
+
+VRR and HDR require supported hardware and are opt-in per output in the Umbriel config. See the commented `[output.DP-1]` example and [Umbriel's output documentation](https://docs.noctalia.dev/umbriel/outputs/). Fullscreen, direct scanout, multi-monitor placement, and native Xwayland use Umbriel's own implementation. Screen sharing uses the Umbriel portal.
 
 The image uses two main portal backends: `xdg-desktop-portal-gtk` for general interfaces, and `xdg-desktop-portal-umbriel-nightly` for ScreenCast and Screenshot. The [portal preference](files/system/etc/xdg-desktop-portal/umbriel-portals.conf) is named for the `Umbriel` desktop session. GNOME Keyring remains for Secret Service and greetd PAM login-keyring unlock; it is not the GNOME screen-capture backend.
 
 **Current Terra RPM caveat:** `umbriel-nightly` still declares `xwayland-satellite` as a hard dependency, although the installed binary uses wlroots native Xwayland. Satellite is installed transitively but is never started by the Umbriel config. The image removes it automatically once Terra drops that obsolete RPM requirement, avoiding a broken dependency graph in the meantime.
 
-Fedora's greetd RPM creates the **`greetd`** account. The greeter runs as that account; tmpfiles and a service prestart create `/var/lib/noctalia-greeter` and its initial settings on each boot, because bootc does not ship `/var`. The existing Fedora greetd PAM stack includes `system-auth` and `pam_gnome_keyring.so`.
+Fedora's greetd RPM creates the **`greetd`** account. The greeter runs as that account; tmpfiles and a service prestart create `/var/lib/noctalia-greeter` and its initial settings on each boot, because bootc does not ship `/var`. A second prestart copies the [greeter display and clock settings](files/system/etc/noctalia-greeter/greeter.toml) into its state directory. The greeter uses Breezy's portrait rotation and placement, scale 1, and a 12-hour clock. The existing Fedora greetd PAM stack includes `system-auth` and `pam_gnome_keyring.so`.
 
 ## First switch and signatures
 

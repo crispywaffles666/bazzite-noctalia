@@ -131,6 +131,9 @@ if ! HOME="$test_home" XDG_CONFIG_HOME="$test_home/.config" umbriel config valid
     fail "skel Umbriel config failed umbriel config validate"
 fi
 rm -rf "$test_home"
+[[ -x /etc/skel/.local/bin/umbriel-auto-fullwidth.py ]] || fail "Umbriel column-width helper missing"
+python3 -c 'import ast, pathlib; ast.parse(pathlib.Path("/etc/skel/.local/bin/umbriel-auto-fullwidth.py").read_text())' || fail "Umbriel column-width helper has invalid Python syntax"
+python3 -c 'import json, pathlib; json.loads(pathlib.Path("/etc/skel/.config/umbriel/output-widths.json").read_text())' || fail "Umbriel output widths are invalid JSON"
 
 # Check the exact greeter executable, account, state path, and PAM/keyring
 # setup provided by the Fedora greetd and Terra greeter RPMs.
@@ -148,6 +151,10 @@ grep -Eq '^auth[[:space:]]+substack[[:space:]]+system-auth' /etc/pam.d/greetd ||
 grep -Eq '^session[[:space:]]+include[[:space:]]+system-auth' /etc/pam.d/greetd || fail "greetd PAM systemd session path missing"
 grep -Eq '^[-]?auth[[:space:]]+optional[[:space:]]+pam_gnome_keyring.so' /etc/pam.d/greetd || fail "greetd PAM keyring unlock missing"
 grep -Eq '^[-]?session[[:space:]]+optional[[:space:]]+pam_gnome_keyring.so auto_start' /etc/pam.d/greetd || fail "greetd PAM keyring startup missing"
+greeter_admin=/etc/noctalia-greeter/greeter.toml
+[[ -r "$greeter_admin" ]] || fail "Noctalia Greeter administrator config missing"
+python3 -c 'import tomllib,sys; c=tomllib.load(open(sys.argv[1],"rb")); assert c["clock"]["time_format"] == "%I:%M %p"; assert c["output"]["layout"] == "DP-4:0,184; DP-3:2560,0"; assert c["output"]["transforms"] == "DP-4:normal; DP-3:270"; assert c["output"]["scales"] == "DP-4:1; DP-3:1"' "$greeter_admin" || fail "Noctalia Greeter display or 12-hour clock settings invalid"
+grep -Fq 'ExecStartPre=/usr/bin/install -m 0640 -o greetd -g greetd /etc/noctalia-greeter/greeter.toml /var/lib/noctalia-greeter/greeter.toml' /etc/systemd/system/greetd.service.d/10-noctalia-greeter.conf || fail "Noctalia Greeter administrator config is not installed at startup"
 
 # The RPM provides the backend ID and the desktop-specific filename. The
 # /etc preference chooses GTK generally and Umbriel for screen capture.
