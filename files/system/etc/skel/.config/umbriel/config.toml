@@ -1,7 +1,7 @@
 # Starter configuration for bazzite-noctalia. Umbriel's native session starts
 # through /usr/share/wayland-sessions/umbriel.desktop (Exec=start-umbriel).
 [general]
-autostart = ["noctalia", "screenshot-notify.sh"]
+autostart = ["noctalia", "$HOME/.local/bin/screenshot-notify.sh"]
 xwayland = true
 xwayland_native_resolution = true
 
@@ -54,7 +54,7 @@ natural_scroll = true
 "Super+Backslash" = "spawn:ghostty"
 "Mod+B" = "spawn:brave-origin"
 "Mod+E" = "spawn:nautilus"
-"Mod+Period" = "spawn:smile-paste.sh"
+"Mod+Period" = "spawn:$HOME/.local/bin/smile-paste.sh"
 "Mod+Q" = "window-close"
 "Mod+Shift+Q" = "spawn:noctalia msg panel-toggle power-menu"
 "Mod+Alt+L" = "spawn:loginctl lock-session"
