@@ -1,6 +1,6 @@
 # bazzite-noctalia
 
-Bazzite's gaming foundation with the GNOME desktop stack replaced by the Noctalia ecosystem: **Umbriel** compositor, **Noctalia Shell**, and **Noctalia Greeter** through greetd. This is a separate image derived from [bazzite-niri](https://github.com/crispywaffles666/bazzite-niri); the Niri image remains independent.
+Bazzite's gaming foundation with the GNOME desktop stack replaced by the Noctalia ecosystem: **Umbriel** compositor, **Noctalia Shell**, and **Noctalia Greeter** through greetd. This image was derived from my [bazzite-niri](https://github.com/crispywaffles666/bazzite-niri) image
 
 - Base: `ghcr.io/ublue-os/bazzite-gnome:stable` (Fedora 44)
 - Image: `ghcr.io/crispywaffles666/bazzite-noctalia:latest`
@@ -14,8 +14,6 @@ Bazzite's gaming foundation with the GNOME desktop stack replaced by the Noctali
 The Terra RPM supplies `/usr/share/wayland-sessions/umbriel.desktop` with `Exec=start-umbriel`. Noctalia Greeter selects **Umbriel** by default. The starter [Umbriel config](files/system/etc/skel/.config/umbriel/config.toml) autostarts Noctalia, preserves the original image's Dracula colors, scrolling layout, common keybinds, and Screenshot notifier. Umbriel supplies Xwayland internally; Bazzite's existing Terra Xwayland package provides its server binary.
 
 Noctalia's [starter config](files/system/etc/skel/.config/noctalia/config.toml) keeps the source image's shell look and functionality. Noctalia handles screenshots and saves them to `~/Pictures/Screenshots`. The included app configs and helper scripts are otherwise inherited from `bazzite-niri`.
-
-The Umbriel config matches Breezy's Niri monitor layout: Z27q G3 at 2560×1440, Z24n G3 rotated 270° at 1920×1200, both at scale 1, with named workspaces 1–3 and 4–5 respectively. Other monitors use Umbriel's defaults. The [column-width helper](files/system/etc/skel/.local/bin/umbriel-auto-fullwidth.py) uses [output-widths.json](files/system/etc/skel/.config/umbriel/output-widths.json) to restore 50% width on the main display or full width on the portrait display when a tiled column crosses outputs.
 
 Window moves use a spring curve, and Umbriel's drag physics adds motion and settling when a window is dragged into place.
 
