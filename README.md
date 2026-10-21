@@ -17,6 +17,8 @@ Noctalia's [starter config](files/system/etc/skel/.config/noctalia/config.toml) 
 
 The Umbriel config matches Breezy's Niri monitor layout: Z27q G3 at 2560×1440, Z24n G3 rotated 270° at 1920×1200, both at scale 1, with named workspaces 1–3 and 4–5 respectively. Other monitors use Umbriel's defaults. The [column-width helper](files/system/etc/skel/.local/bin/umbriel-auto-fullwidth.py) uses [output-widths.json](files/system/etc/skel/.config/umbriel/output-widths.json) to restore 50% width on the main display or full width on the portrait display when a tiled column crosses outputs.
 
+Window moves use a spring curve, and Umbriel's drag physics adds motion and settling when a window is dragged into place.
+
 `Mod+Space` opens Umbriel's overview. `Alt+Space` and `Mod+S` open Noctalia's launcher directly. Terra currently ships Noctalia 5.0.0-beta.9, which does not support typing in Umbriel's overview to open the launcher; upstream added that in 5.2.0.
 
 VRR and HDR require supported hardware and are opt-in per output in the Umbriel config. See the commented `[output.DP-1]` example and [Umbriel's output documentation](https://docs.noctalia.dev/umbriel/outputs/). Fullscreen, direct scanout, multi-monitor placement, and native Xwayland use Umbriel's own implementation. Screen sharing uses the Umbriel portal.

@@ -58,6 +58,9 @@ curve = "easeout"
 [animation.windows_move]
 curve = "spring:1,800"
 
+[animation.windows_drag]
+physics = true
+
 [animation.workspaces]
 curve = "spring:1,1000"
 
