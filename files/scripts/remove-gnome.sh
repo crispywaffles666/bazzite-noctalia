@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-# Keep Niri's portal, keyring, file manager, and their shared GTK tools.
+# Keep the GTK portal, keyring, file manager, and their shared GTK tools.
 # Check each package first because Bazzite may change its package set.
 set -euxo pipefail
 
@@ -17,6 +17,7 @@ packages=(
     rom-properties-localsearch3
     gnome-backgrounds gnome-epub-thumbnailer
     gnome-shell-extension-user-theme gnome-shell-extension-gsconnect
+    xdg-desktop-portal-gnome
 )
 
 family_pattern='^(gnome-shell-extension-|papers)'
@@ -32,7 +33,7 @@ while read -r pkg; do
 done < <(rpm -qa --qf '%{NAME}\n' | grep -E "$family_pattern" || true)
 
 # Mark these as user-picked so autoremove keeps them.
-dnf5 -y mark user xdg-desktop-portal-gnome xdg-desktop-portal-gtk gnome-keyring gnome-keyring-pam nautilus
+dnf5 -y mark user xdg-desktop-portal-umbriel-nightly xdg-desktop-portal-gtk gnome-keyring gnome-keyring-pam nautilus
 
 if [ "${#remove[@]}" -gt 0 ]; then
     # A normal remove ignores install reasons and drops Nautilus with its add-ons.
@@ -41,3 +42,10 @@ if [ "${#remove[@]}" -gt 0 ]; then
 fi
 
 dnf5 -y autoremove
+
+# An older Terra Umbriel RPM declares an obsolete hard requirement on
+# xwayland-satellite. Drop the package as soon as Terra removes that metadata;
+# while the requirement remains, leave the RPM transaction graph consistent.
+if rpm -q --quiet xwayland-satellite && ! rpm -q --requires umbriel-nightly | grep -Fxq xwayland-satellite; then
+    dnf5 -y remove xwayland-satellite
+fi

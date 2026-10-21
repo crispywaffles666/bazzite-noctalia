@@ -1,15 +1,17 @@
 #!/usr/bin/bash
-# Catch Fedora or Bazzite package changes that would break the Niri desktop.
+# Catch Fedora, Terra, or Bazzite changes that would break this desktop.
 set -euxo pipefail
 
 required=(
-    niri
+    umbriel-nightly
     noctalia
+    noctalia-greeter
+    greetd
     gnome-keyring
     # The PAM module that unlocks the login keyring via greetd. GDM depends
     # on it, so the GNOME removal path must not let autoremove take it.
     gnome-keyring-pam
-    xdg-desktop-portal-gnome
+    xdg-desktop-portal-umbriel-nightly
     xdg-desktop-portal-gtk
     nautilus
 )
@@ -19,6 +21,9 @@ banned=(
     mutter
     gdm
     gnome-session
+    xdg-desktop-portal-gnome
+    niri
+    tuigreet
 )
 
 for pkg in "${required[@]}"; do
@@ -30,10 +35,21 @@ done
 
 for pkg in "${banned[@]}"; do
     if rpm -q --quiet "$pkg"; then
-        echo "ERROR: forbidden GNOME desktop package is installed: $pkg" >&2
+        echo "ERROR: forbidden desktop package is installed: $pkg" >&2
         exit 1
     fi
 done
+
+# Terra's current Umbriel RPM has a stale hard dependency on Satellite despite
+# using wlroots native Xwayland. Keep RPM dependencies consistent until Terra
+# removes it; fail if Satellite becomes an unneeded leftover.
+if rpm -q --quiet xwayland-satellite; then
+    if ! rpm -q --requires umbriel-nightly | grep -Fxq xwayland-satellite; then
+        echo "ERROR: xwayland-satellite is installed without an Umbriel RPM requirement" >&2
+        exit 1
+    fi
+    echo "WARNING: Terra umbriel-nightly still requires unused xwayland-satellite" >&2
+fi
 
 if rpm -q --quiet sassc; then
     echo "ERROR: theme build-only package leaked into the final image: sassc" >&2
@@ -87,7 +103,7 @@ for gtk_settings in /etc/skel/.config/gtk-{3,4}.0/settings.ini; do
         exit 1
     fi
 done
-theme_schema=/usr/share/glib-2.0/schemas/zz_bazzite-niri.gschema.override
+theme_schema=/usr/share/glib-2.0/schemas/zz_bazzite-noctalia.gschema.override
 if ! grep -Fxq "gtk-theme='Graphite-purple-Dark-dracula'" "$theme_schema"; then
     echo "ERROR: GNOME schema override has the wrong GTK theme name" >&2
     exit 1
@@ -102,19 +118,47 @@ fail() {
     exit 1
 }
 
-# Parse all included files with the niri version in this image. The temporary
-# home keeps the check free of any builder-user state and needs no session.
-niri_skel=/etc/skel/.config/niri
-if [[ ! -f "$niri_skel/config.kdl" ]]; then
-    fail "skel niri config.kdl missing: $niri_skel/config.kdl"
+# Parse the starter config with the installed Umbriel binary. This needs no
+# graphical session and rejects renamed actions and unsupported options.
+umbriel_skel=/etc/skel/.config/umbriel
+if [[ ! -f "$umbriel_skel/config.toml" ]]; then
+    fail "skel Umbriel config.toml missing: $umbriel_skel/config.toml"
 fi
 test_home="$(mktemp -d)"
 mkdir -p "$test_home/.config"
-cp -r "$niri_skel" "$test_home/.config/niri"
-if ! HOME="$test_home" XDG_CONFIG_HOME="$test_home/.config" niri validate; then
-    fail "skel niri config failed niri validate (removed option or broken include?)"
+cp -r "$umbriel_skel" "$test_home/.config/umbriel"
+if ! HOME="$test_home" XDG_CONFIG_HOME="$test_home/.config" umbriel config validate; then
+    fail "skel Umbriel config failed umbriel config validate"
 fi
 rm -rf "$test_home"
+
+# Check the exact greeter executable, account, state path, and PAM/keyring
+# setup provided by the Fedora greetd and Terra greeter RPMs.
+[[ -x /usr/bin/noctalia-greeter-session ]] || fail "Noctalia greeter session wrapper missing"
+[[ -x /usr/bin/noctalia-greeter-apply-appearance ]] || fail "Noctalia greeter state helper missing"
+[[ -x /usr/bin/start-umbriel ]] || fail "Umbriel native launcher missing"
+[[ -x /usr/bin/Xwayland ]] || fail "Umbriel native Xwayland server missing"
+grep -Eq '^Exec=(/usr/bin/)?start-umbriel$' /usr/share/wayland-sessions/umbriel.desktop || fail "Umbriel session does not use start-umbriel"
+grep -Fxq 'DesktopNames=Umbriel' /usr/share/wayland-sessions/umbriel.desktop || fail "Umbriel session desktop name changed"
+grep -Fxq 'command = "/usr/bin/noctalia-greeter-session -- --session Umbriel"' /etc/greetd/config.toml || fail "greetd does not select Umbriel via Noctalia Greeter"
+grep -Fxq 'user = "greetd"' /etc/greetd/config.toml || fail "greetd greeter user changed"
+getent passwd greetd >/dev/null || fail "Fedora greetd account missing"
+grep -Eq '^d /var/lib/noctalia-greeter 0750 greetd greetd ' /usr/lib/tmpfiles.d/noctalia-greeter.conf || fail "greeter state tmpfiles rule missing"
+grep -Eq '^auth[[:space:]]+substack[[:space:]]+system-auth' /etc/pam.d/greetd || fail "greetd PAM system-auth missing"
+grep -Eq '^session[[:space:]]+include[[:space:]]+system-auth' /etc/pam.d/greetd || fail "greetd PAM systemd session path missing"
+grep -Eq '^[-]?auth[[:space:]]+optional[[:space:]]+pam_gnome_keyring.so' /etc/pam.d/greetd || fail "greetd PAM keyring unlock missing"
+grep -Eq '^[-]?session[[:space:]]+optional[[:space:]]+pam_gnome_keyring.so auto_start' /etc/pam.d/greetd || fail "greetd PAM keyring startup missing"
+
+# The RPM provides the backend ID and the desktop-specific filename. The
+# /etc preference chooses GTK generally and Umbriel for screen capture.
+portal_impl=/usr/share/xdg-desktop-portal/portals/umbriel.portal
+portal_pref=/etc/xdg-desktop-portal/umbriel-portals.conf
+[[ -r "$portal_impl" && -r "$portal_pref" ]] || fail "Umbriel portal implementation or preference missing"
+grep -Fq 'org.freedesktop.impl.portal.ScreenCast' "$portal_impl" || fail "Umbriel portal has no ScreenCast interface"
+grep -Fq 'org.freedesktop.impl.portal.Screenshot' "$portal_impl" || fail "Umbriel portal has no Screenshot interface"
+grep -Fxq 'default=gtk' "$portal_pref" || fail "GTK portal is not default"
+grep -Fxq 'org.freedesktop.impl.portal.ScreenCast=umbriel' "$portal_pref" || fail "ScreenCast does not use Umbriel"
+grep -Fxq 'org.freedesktop.impl.portal.Screenshot=umbriel' "$portal_pref" || fail "Screenshot does not use Umbriel"
 
 # Parse the shipped Noctalia shell config with the exact noctalia build in
 # this image. Validating by directory path keeps the check offline: no
@@ -150,19 +194,19 @@ rm -rf "$noctalia_home"
 # the registries.d sigstore config, and the public key all name the same GHCR
 # namespace and key path. The README tells forks to change the namespace and
 # key together; a forgotten half-edit must fail the build here.
-sig_key=/etc/pki/containers/ghcr.io-crispywaffles666-bazzite-niri.pub
+sig_key=/etc/pki/containers/ghcr.io-crispywaffles666-bazzite-noctalia.pub
 if [[ ! -s "$sig_key" ]]; then
     fail "container signature public key missing: $sig_key"
 fi
 
-sigstore_config=/etc/containers/registries.d/ghcr.io-crispywaffles666-bazzite-niri.yaml
+sigstore_config=/etc/containers/registries.d/ghcr.io-crispywaffles666-bazzite-noctalia.yaml
 if [[ ! -r "$sigstore_config" ]]; then
     fail "registries sigstore config missing: $sigstore_config"
 fi
 if ! grep -q 'use-sigstore-attachments: true' "$sigstore_config"; then
     fail "registries config missing use-sigstore-attachments"
 fi
-if ! grep -q 'ghcr.io/crispywaffles666/bazzite-niri' "$sigstore_config"; then
+if ! grep -q 'ghcr.io/crispywaffles666/bazzite-noctalia' "$sigstore_config"; then
     fail "registries config missing GHCR namespace"
 fi
 
@@ -175,7 +219,7 @@ if command -v python3 >/dev/null 2>&1; then
         fail "container policy is not valid JSON: $policy_file"
     fi
 fi
-if ! grep -q '"ghcr.io/crispywaffles666/bazzite-niri"' "$policy_file"; then
+if ! grep -q '"ghcr.io/crispywaffles666/bazzite-noctalia"' "$policy_file"; then
     fail "container policy missing GHCR namespace"
 fi
 if ! grep -q '"type": "sigstoreSigned"' "$policy_file"; then

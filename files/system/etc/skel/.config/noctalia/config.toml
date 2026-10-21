@@ -14,10 +14,9 @@ avatar_path           = "~/.face"
 password_style        = "default"
 clipboard_enabled     = true
 app_icon_colorize     = false
-niri_overview_type_to_launch_enabled = true
 
 [shell.screenshot]
-save_to_file      = false
+save_to_file      = true
 copy_to_clipboard = false
 
 [shell.animation]
@@ -167,12 +166,6 @@ position             = "top_right"
 background_opacity   = 1.0
 layer                = "overlay"
 monitors             = []
-
-[notification.filter.niri-screenshot]
-match         = "niri"
-match_content = "Screenshot captured"
-show_toast    = false
-save_history  = false
 
 # ── Wallpaper ──
 

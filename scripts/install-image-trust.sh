@@ -9,8 +9,8 @@ if [[ $sysroot == / && $EUID != 0 ]]; then
     exit 1
 fi
 repo_root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
-image=ghcr.io/crispywaffles666/bazzite-niri
-key_path=/etc/pki/containers/ghcr.io-crispywaffles666-bazzite-niri.pub
+image=ghcr.io/crispywaffles666/bazzite-noctalia
+key_path=/etc/pki/containers/ghcr.io-crispywaffles666-bazzite-noctalia.pub
 policy="${sysroot%/}/etc/containers/policy.json"
 [[ -s $policy ]] || { echo "Missing existing policy: $policy; refusing to invent defaults." >&2; exit 1; }
 
@@ -31,15 +31,15 @@ if [[ $EUID == 0 ]]; then chown --reference="$policy" "$tmp"; fi
 
 install -D -m 0644 "$repo_root/cosign.pub" "${sysroot%/}$key_path"
 install -D -m 0644 \
-    "$repo_root/files/system/etc/containers/registries.d/ghcr.io-crispywaffles666-bazzite-niri.yaml" \
-    "${sysroot%/}/etc/containers/registries.d/ghcr.io-crispywaffles666-bazzite-niri.yaml"
+    "$repo_root/files/system/etc/containers/registries.d/ghcr.io-crispywaffles666-bazzite-noctalia.yaml" \
+    "${sysroot%/}/etc/containers/registries.d/ghcr.io-crispywaffles666-bazzite-noctalia.yaml"
 # Preserve the pre-bootstrap policy once, including when the script is rerun.
-if [[ ! -e ${policy}.before-bazzite-niri ]]; then
-    cp -p -- "$policy" "${policy}.before-bazzite-niri"
+if [[ ! -e ${policy}.before-bazzite-noctalia ]]; then
+    cp -p -- "$policy" "${policy}.before-bazzite-noctalia"
 fi
 mv -f -- "$tmp" "$policy"
 if [[ $sysroot == / ]] && command -v restorecon >/dev/null; then
-    restorecon "$policy" "$key_path" /etc/containers/registries.d/ghcr.io-crispywaffles666-bazzite-niri.yaml
+    restorecon "$policy" "$key_path" /etc/containers/registries.d/ghcr.io-crispywaffles666-bazzite-noctalia.yaml
 fi
-echo 'Installed bazzite-niri trust; unrelated policy entries preserved.'
-echo "Original policy backup: ${policy}.before-bazzite-niri"
+echo 'Installed bazzite-noctalia trust; unrelated policy entries preserved.'
+echo "Original policy backup: ${policy}.before-bazzite-noctalia"

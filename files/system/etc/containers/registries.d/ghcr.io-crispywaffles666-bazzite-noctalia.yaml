@@ -1,5 +1,5 @@
 # Fetch this image's signatures from GHCR. policy.json holds the trust rule.
 # https://github.com/containers/image/blob/main/docs/containers-registries.d.5.md
 docker:
-  ghcr.io/crispywaffles666/bazzite-niri:
+  ghcr.io/crispywaffles666/bazzite-noctalia:
     use-sigstore-attachments: true

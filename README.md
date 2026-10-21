@@ -1,233 +1,61 @@
-# bazzite-niri
+# bazzite-noctalia
 
-This is my personal bazzite image which strips out most of GNOME and instead replaces it with niri and the required tooling and services for my dots.
-
-## Standout features of this image:
-- **All of bazzite, minus GNOME:** keeps the kernel, gaming stack, codecs, and hardware support that from-scratch niri images make you reassemble yourself.
-- **Actually strips the base DE:** many similar images based on bazzite simply layer the compositor on top of the unused DE session. GNOME is completely removed from this image aside from a couple packages that support the niri environment (nautilus, keyring, portals).
-- **greetd + tuigreet as Display Manager:** using this as our display manager means we avoid installing much of the GNOME/KDE stack that comes with using their Display Managers.
-- **Avoids COPR:** All packages are sourced from the official Fedora repos, terra, or brave's first-party rpm repo.
-- **Replicates a tuned Arch/CachyOS desktop:** My lived-in Niri/Noctalia CachyOS desktop was used as the reference for this image:
-<img width="2560" height="1440" alt="image" src="https://github.com/user-attachments/assets/e14954d4-3e13-43b4-bfed-70ff6754043c" />
-<img width="2560" height="1440" alt="image" src="https://github.com/user-attachments/assets/95cda50b-95e4-49e7-8d94-266b3401d73a" />
-
-
-
-
-## Rebasing onto this image
-
-The first switch starts on your **current** installation: the destination
-image's key and policy are not installed yet. Bootstrap trust before enforcing
-it. From a checkout of this repository that you trust, review `cosign.pub` and
-`scripts/install-image-trust.sh`, then run:
-
-```bash
-git clone https://github.com/crispywaffles666/bazzite-niri.git
-cd bazzite-niri
-# Review this checkout/key through a trusted channel before running as root.
-sudo bash scripts/install-image-trust.sh
-```
-
-The script requires `jq`, installs this image's public key and signature lookup
-configuration, and atomically merges **only this repository's rule** into your
-existing `/etc/containers/policy.json`. It preserves unrelated rules and saves
-the original policy as `policy.json.before-bazzite-niri`. It does not switch or
-reboot your system. To view the key fingerprint: `sha256sum cosign.pub`; compare
-it through an independently trusted channel if you need to authenticate the
-initial checkout. Downloading a key from the same repository is a trust
-decision, not independent proof of the publisher's identity.
-
-Now perform the verified switch:
-
-```bash
-sudo bootc switch --enforce-container-sigpolicy ghcr.io/crispywaffles666/bazzite-niri:latest
-sudo systemctl reboot
-```
-**Rollback:** bootc keeps the previous deployment. Pick the old entry in the
-boot menu, or after booting: `sudo bootc rollback`.
-
-**Update verification:** the image ships its own container policy and cosign
-public key (`/etc/containers/policy.json` +
-`/etc/pki/containers/ghcr.io-crispywaffles666-bazzite-niri.pub`), so every
-update pull after the first switch — not just the initial rebase — is verified
-against the signing key.
-
-<details>
-<summary><strong>Rebased and stuck in niri with a bad config?</strong></summary>
-
-If you rebase to this image without planning ahead. You may find yourself stuck in niri unable to do anything. In that case:
-
-1. Switch to a TTY with `Ctrl+Alt+F3` and log in.
-
-2. Copy the niri config, the noctalia shell config it launches, and the helper
-   scripts its autostart expects:
-
-   ```bash
-   cp -r /etc/skel/.config/niri ~/.config/
-   cp -r /etc/skel/.config/noctalia ~/.config/
-   cp -r /etc/skel/.local/bin ~/.local/
-   ```
-
-3. niri live-reloads its config, so switch back to the graphical session
-   (`Ctrl+Alt+F2`) and you should have a working environment. Copy more of
-   `/etc/skel` later if you want the full setup (terminal, shell, and other
-   app configs).
-
-</details>
-
-<details>
-<summary><strong>A note if you're bringing your own niri config:</strong></summary>
-
-This image is built around Noctalia shell. Noctalia provides most of the desktop stack (bar, launcher, notifications, lock screen, idle management). Because of that, alternatives such as `waybar`, `fuzzel`, `swaylock`, and `swayidle` are not included.
-
-If your existing config depends on a different set of shell components, expect to layer the packages you need or fork this image and add them to the build.
-</details>
-
-## Copying my configs:
-The image ships starter user configs through `/etc/skel`. They are copied into
-a home directory only when a new user is created — existing users never
-receive updates to them automatically (this section is how you pull in new
-versions manually). At image build time the skel niri config is parsed by the
-installed `niri validate` (including every `cfg/*.kdl` include) and the
-Noctalia config (`config.toml`, v5 format) by the installed
-`noctalia config validate`, so a starter config that goes stale as niri or
-Noctalia update fails the build instead of breaking fresh installs.
-
-Whether you want them just to get a working environment, or to build off of; the bare minimum niri config, the noctalia shell config, and helper scripts can be copied by:
-
-   ```bash
-   cp -r /etc/skel/.config/niri ~/.config/
-   cp -r /etc/skel/.config/noctalia ~/.config/
-   cp -r /etc/skel/.local/bin ~/.local/
-   ```
-From there you can look at what else is included and decide how much you want to copy:
-
-   ```bash
-   ls /etc/skel
-   ls /etc/skel/.config
-   ```
-
-My keybinds to get you started:
-
-| Keybind | Action |
-|---|---|
-| `Mod+\` | Terminal (Ghostty) |
-| `Super+Space` / `Alt+Space` | App launcher (**see note below**) |
-| `Mod+E` | File manager (Nautilus) |
-| `Mod+Q` | Close window |
-| `Mod+H` / `Mod+L` (or ←/→) | Focus column left/right |
-| `Mod+K` / `Mod+J` (or ↑/↓) | Focus window up/down |
-| `Mod+Ctrl+H/L/K/J` (or Ctrl+arrows) | Move column/window |
-| `Mod+1`–`Mod+9` | Switch workspace |
-| `Mod+Ctrl+1`–`Mod+Ctrl+9` | Move column to workspace |
-| `Mod+F` | Fullscreen window |
-| `Mod+T` | Toggle floating |
-| `Mod+-` / `Mod+=` | Shrink/grow column width |
-| `Print` | Screenshot |
-| `Ctrl+Alt+Delete` | Quit niri |
-
-**Launcher:**
-- `Alt+Space` then type while the overview is showing
-- Or in `~/.config/niri/cfg/keybinds.kdl`, change `Super+Space repeat=false { toggle-overview; }` to `Super+Space repeat=false { spawn-sh "noctalia msg panel-toggle launcher"; }`.
-
-**A few things you might want to install depending on how much you're copying my configs:** 
-
-| What | Which config wants it | Install |
-|---|---|---|
-| `pfetch` | runs at every interactive bash/zsh startup (`.bashrc`, `.zshrc`) | `brew install pfetch-rs` (or `cargo install pfetch`) |
-| `antidote` | `.zshrc` sources it for zsh plugins if present | `brew install antidote` |
-| ble.sh | `.bashrc` sources `~/.local/share/blesh/ble.sh` if present (optional bash line editor) | build from source into `~/.local/share/blesh` |
-| Graphite GTK / Dracula icons | generated/downloaded from pinned, checksum-verified upstream source during image construction (`Graphite-purple-Dark-dracula` / `dracula-icons-main`), set by gschema override + `/etc/skel` | nothing to install |
-
-## Why use `bazzite-gnome` ?
-
-A few reasons:
-1. I was running `bazzite-gnome` before rebasing to this image
-2. I tend to gravitate more towards GNOME tooling than KDE (i.e. nautilus is my gui file manager of choice included in this image)
-3. This image replicates my CachyOS setup as closely as possible, which also made use of GNOME tooling such as the keyring and portals.
-4. `gnome-keyring` does some heavy lifting here, supporting both our display manager and niri session. Doing the same with KDE tooling would require bringing in all of SDDM.
-
-## About:
-
-This is a custom [bootc](https://bootc-dev.github.io/) image: **bazzite-gnome with GNOME
-stripped, running the niri compositor + noctalia shell**, replicating my CachyOS
-desktop setup. Built with [BlueBuild](https://blue-build.org), signed with
-cosign, published to GHCR by GitHub Actions.
+Bazzite's gaming foundation with the GNOME desktop stack replaced by the Noctalia ecosystem: **Umbriel** compositor, **Noctalia Shell**, and **Noctalia Greeter** through greetd. This is a separate image derived from [bazzite-niri](https://github.com/crispywaffles666/bazzite-niri); the Niri image remains independent.
 
 - Base: `ghcr.io/ublue-os/bazzite-gnome:stable` (Fedora 44)
-- Compositor: `niri` + `xwayland-satellite` (official Fedora repos)
-- Shell: `noctalia` v5 (Terra, enabled at build only)
-- Display manager: `greetd` + `tuigreet` (GDM removed; both from the official Fedora repos)
-- Kept from GNOME: `xdg-desktop-portal-gnome` (niri has no portal backend),
-  `gnome-keyring` (Secret Service / portal provider), `nautilus` (file manager)
+- Image: `ghcr.io/crispywaffles666/bazzite-noctalia:latest`
+- Build: BlueBuild + bootc; daily GitHub Actions builds, cosign signing, verified base digest
+- Package sources: Fedora, Terra (enabled only during build), Brave's official RPM repository; no added COPR
+- Retained: Bazzite kernel, drivers, codecs, gaming stack, GNOME Keyring/PAM, Nautilus, Graphite GTK theme, Dracula icons, Overpass Nerd Font, and the existing desktop utilities
+- Removed: GNOME Shell/session, GDM, GNOME portal, Niri, and tuigreet
 
-## Package sources
+## Desktop and session
 
-| Source | Packages |
-|---|---|
-| Fedora 44 | niri, xwayland-satellite, greetd, tuigreet, alacritty, brightnessctl, playerctl, inotify-tools, wl-clipboard, pavucontrol, cava, seahorse, xterm, zsh, bat, micro, geany, ripgrep, stow, overpass-fonts, xdg-desktop-portal-gnome, gnome-keyring, nautilus |
-| terra (enabled at build only) | noctalia, ghostty, satty, yazi, starship, keyd (service left disabled; opt in with `systemctl enable --now keyd` plus your own `/etc/keyd` config) |
-| brave (first-party rpm repo, enabled at build only) | brave-origin |
-| Vendored at build | Overpass Nerd Font (pinned Arch package `otf-overpass-nerd-3.4.0-2`, sha256-verified — not in Fedora/COPR/nerd-fonts release zips) |
+The Terra RPM supplies `/usr/share/wayland-sessions/umbriel.desktop` with `Exec=start-umbriel`. Noctalia Greeter selects **Umbriel** by default. The starter [Umbriel config](files/system/etc/skel/.config/umbriel/config.toml) autostarts Noctalia, preserves the original image's Dracula colors, scrolling layout, common keybinds, and Screenshot notifier. Umbriel supplies Xwayland internally; Bazzite's existing Terra Xwayland package provides its server binary.
 
-The Graphite GTK theme is generated with `sassc` from the pinned upstream
-Dracula-support merge commit, and the unmodified upstream Dracula icon theme
-is downloaded from its pinned commit. Both commit archives are SHA-256
-verified by `files/scripts/install-themes.sh`. A disposable build stage keeps
-the source trees and theme build dependencies out of the final image while
-retaining upstream licensing notices.
+Noctalia's [starter config](files/system/etc/skel/.config/noctalia/config.toml) keeps the source image's shell look and functionality. Noctalia handles screenshots and saves them to `~/Pictures/Screenshots`. The included app configs and helper scripts are otherwise inherited from `bazzite-niri`.
 
-GNOME removal is done by `files/scripts/remove-gnome.sh`: an explicit list
-filtered through `rpm -q`, `clean_requirements_on_remove=false` (dnf5's remove
-cascade ignores install reasons — without this, nautilus is destroyed as an
-orphan of `nautilus-gsconnect`), then `dnf5 autoremove`.
+Umbriel selects each display's preferred mode. VRR and HDR require supported hardware and are opt-in per output in the Umbriel config. See the commented `[output.DP-1]` example and [Umbriel's output documentation](https://docs.noctalia.dev/umbriel/outputs/). Fullscreen, direct scanout, multi-monitor placement, and native Xwayland use Umbriel's own implementation. Screen sharing uses the Umbriel portal.
 
+The image uses two main portal backends: `xdg-desktop-portal-gtk` for general interfaces, and `xdg-desktop-portal-umbriel-nightly` for ScreenCast and Screenshot. The [portal preference](files/system/etc/xdg-desktop-portal/umbriel-portals.conf) is named for the `Umbriel` desktop session. GNOME Keyring remains for Secret Service and greetd PAM login-keyring unlock; it is not the GNOME screen-capture backend.
 
-## Setup (fork / first push)
+**Current Terra RPM caveat:** `umbriel-nightly` still declares `xwayland-satellite` as a hard dependency, although the installed binary uses wlroots native Xwayland. Satellite is installed transitively but is never started by the Umbriel config. The image removes it automatically once Terra drops that obsolete RPM requirement, avoiding a broken dependency graph in the meantime.
 
-1. Push this repo to your GitHub account.
-2. Generate a cosign key pair and add the private key as a repo secret:
+Fedora's greetd RPM creates the **`greetd`** account. The greeter runs as that account; tmpfiles and a service prestart create `/var/lib/noctalia-greeter` and its initial settings on each boot, because bootc does not ship `/var`. The existing Fedora greetd PAM stack includes `system-auth` and `pam_gnome_keyring.so`.
 
-   ```bash
-   cosign generate-key-pair   # creates cosign.key / cosign.pub
-   # GitHub repo → Settings → Secrets and variables → Actions → new secret:
-   #   name: SIGNING_SECRET   value: <contents of cosign.key>
-   ```
+## First switch and signatures
 
-   Commit `cosign.pub` to the repo root. Keep `cosign.key` out of git. Also
-   replace `files/system/etc/pki/containers/*.pub` with your new public key
-   and update the GHCR namespace in `files/system/etc/containers/policy.json`
-   and `files/system/etc/containers/registries.d/*.yaml` to match your repo.
-3. GitHub Actions builds on push (and daily at 06:00 UTC), signs the image,
-   and pushes `ghcr.io/crispywaffles666/bazzite-niri:latest`.
+The new repository must have an Actions secret named `SIGNING_SECRET` containing the private cosign key matching the committed `cosign.pub`. The public key is copied from the source image; you may reuse its private key in this separate repository or generate a new pair and update `cosign.pub` plus `files/system/etc/pki/containers/ghcr.io-crispywaffles666-bazzite-noctalia.pub` together. The workflow publishes signed images only from `main`.
 
-If you skip step 2, the workflow still builds and pushes, but images are
-unsigned and `--enforce-container-sigpolicy` rebases will fail.
-
-## Local build
-
-CI verifies the upstream Bazzite signature with the vendored Universal Blue
-key and gives BlueBuild the same immutable digest. The BlueBuild installer
-is verified too. Only main publishes; branch builds and PRs cannot push images.
-Persistent layer caching is enabled for the pinned theme/font builder, whose
-inputs are copied separately from desktop configuration. The first main-image
-RPM step explicitly bypasses cache, keeping mutable packages fresh on every
-build, including scheduled runs. System configuration is copied after packages.
+Bootstrap the destination image's container signature policy from a reviewed checkout before the first switch:
 
 ```bash
-bluebuild build recipes/recipe.yml
-# inspect: podman pull docker-daemon:localhost/bazzite-niri:latest
-#          podman run --rm localhost/bazzite-niri:latest rpm -qa
+git clone https://github.com/crispywaffles666/bazzite-noctalia.git
+cd bazzite-noctalia
+sudo bash scripts/install-image-trust.sh
+sudo bootc switch --enforce-container-sigpolicy ghcr.io/crispywaffles666/bazzite-noctalia:latest
+sudo systemctl reboot
 ```
 
-## Layout
+The trust script merges only this image's rule into the host policy, installs the public key and sigstore lookup file, and saves the previous policy as `policy.json.before-bazzite-noctalia`. Review `cosign.pub` through a trusted channel before running it. Future pulls use the image's own policy and key. `sudo bootc rollback` returns to the previous deployment.
 
-- `recipes/recipe.yml` — the BlueBuild recipe
-- `files/system/` — copied verbatim to `/` (greetd config, gschema override,
-  `/etc/skel` dotfiles seed, container signing policy + cosign public key)
-- `files/scripts/` — build scripts (GNOME removal, greetd setup, pinned
-  theme/font fetches, `validate-package-set.sh` image gate: package/theme
-  checks plus parsing the `/etc/skel` niri and Noctalia starter configs with
-  the `niri validate` / `noctalia config validate` binaries installed in the
-  image)
-- `.github/workflows/build.yml` — CI (blue-build reusable action, cosign)
+Existing users do not receive `/etc/skel` updates automatically. After switching, copy the starter configs if desired:
+
+```bash
+cp -r /etc/skel/.config/umbriel ~/.config/
+cp -r /etc/skel/.config/noctalia ~/.config/
+cp -r /etc/skel/.local/bin ~/.local/
+```
+
+If the graphical session fails, switch to a TTY with `Ctrl+Alt+F3`, sign in, and copy or repair those configs. The greeter uses VT2.
+
+## Build and validation
+
+```bash
+python3 -m unittest discover -s tests -v
+bluebuild build recipes/recipe.yml
+```
+
+CI verifies the Bazzite base with the vendored Universal Blue key, pins its digest for the build, and signs the published image. The build validates package presence and absence, portal routing, greetd/PAM integration, the Umbriel session, both starter configs with their installed binaries, themes, and signature policy. Terra and Brave are disabled in the shipped image. Build-time theme tools remain in a disposable stage.
+
+`umbriel-nightly` and its portal are moving targets. Each built image is an immutable bootc deployment; keep a known good deployment available for rollback. The build records the installed RPM versions in its package database, while CI's scheduled builds take current Terra RPMs.

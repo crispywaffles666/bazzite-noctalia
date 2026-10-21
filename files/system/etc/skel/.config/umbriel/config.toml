@@ -1,0 +1,149 @@
+# Starter configuration for bazzite-noctalia. Umbriel's native session starts
+# through /usr/share/wayland-sessions/umbriel.desktop (Exec=start-umbriel).
+[general]
+autostart = ["noctalia", "screenshot-notify.sh"]
+xwayland = true
+xwayland_native_resolution = true
+
+[environment]
+ELECTRON_OZONE_PLATFORM_HINT = "auto"
+QT_QPA_PLATFORM = "wayland"
+QT_QPA_PLATFORMTHEME = "gtk3"
+QSG_RENDER_LOOP = "threaded"
+
+[appearance]
+prefer_no_csd = true
+border_width = 2
+corner_radius = 20
+
+[appearance.blur]
+enabled = true
+optimized = true
+passes = 3
+radius = 3
+
+[colors.border]
+focused = "#bd93f9"
+unfocused = "#44475a"
+
+[layout]
+mode = "scrolling"
+gap = 14
+extent_presets = [0.333, 0.5, 0.667]
+
+[layout.scrolling]
+default_extent_fraction = 0.5
+center_focused = "never"
+center_underfull_strip = true
+
+[input.keyboard]
+numlock_toggle = true
+
+[input.touchpad]
+tap = true
+natural_scroll = true
+
+# Umbriel chooses the preferred mode on each connected display. Set per-output
+# VRR and HDR only after confirming the output and GPU support:
+# [output.DP-1]
+# vrr = "fullscreen"
+# hdr = "auto"
+
+[keybinds]
+"Mod+Return" = "spawn:alacritty"
+"Super+Backslash" = "spawn:ghostty"
+"Mod+B" = "spawn:brave-origin"
+"Mod+E" = "spawn:nautilus"
+"Mod+Period" = "spawn:smile-paste.sh"
+"Mod+Q" = "window-close"
+"Mod+Shift+Q" = "spawn:noctalia msg panel-toggle power-menu"
+"Mod+Alt+L" = "spawn:loginctl lock-session"
+"Mod+Space" = "spawn:noctalia msg panel-toggle launcher"
+"Alt+Space" = "overview-toggle"
+"Mod+O" = "overview-toggle"
+"Mod+F" = "window-toggle-fullscreen"
+"Mod+T" = "window-toggle-floating"
+"Mod+W" = "column-toggle-tabbed"
+"Mod+C" = "column-center"
+"Mod+H" = "window-focus-left"
+"Mod+L" = "window-focus-right"
+"Mod+K" = "window-focus-up"
+"Mod+J" = "window-focus-down"
+"Mod+Left" = "window-focus-left"
+"Mod+Right" = "window-focus-right"
+"Mod+Up" = "window-focus-up"
+"Mod+Down" = "window-focus-down"
+"Mod+Ctrl+H" = "column-move-left"
+"Mod+Ctrl+L" = "column-move-right"
+"Mod+Ctrl+K" = "window-move-up"
+"Mod+Ctrl+J" = "window-move-down"
+"Mod+Shift+Left" = "output-focus-left"
+"Mod+Shift+Right" = "output-focus-right"
+"Mod+Ctrl+Shift+Left" = "column-move-to-output-left"
+"Mod+Ctrl+Shift+Right" = "column-move-to-output-right"
+"Mod+WheelUp" = { action = "workspace-previous", cooldown_ms = 150 }
+"Mod+WheelDown" = { action = "workspace-next", cooldown_ms = 150 }
+"Mod+Ctrl+WheelUp" = { action = "column-move-to-workspace-previous", cooldown_ms = 150 }
+"Mod+Ctrl+WheelDown" = { action = "column-move-to-workspace-next", cooldown_ms = 150 }
+"Mod+Tab" = "workspace-previous"
+"Mod+Minus" = "window-set-primary-extent:0.333"
+"Mod+Equal" = "window-set-primary-extent:0.667"
+"Print" = "spawn:noctalia msg screenshot-region"
+"Ctrl+Shift+2" = "spawn:noctalia msg screenshot-fullscreen pick"
+"Ctrl+Shift+3" = "spawn:noctalia msg screenshot-fullscreen"
+"XF86AudioRaiseVolume" = { action = "spawn:noctalia msg volume-up", allow_when_locked = true }
+"XF86AudioLowerVolume" = { action = "spawn:noctalia msg volume-down", allow_when_locked = true }
+"XF86AudioMute" = { action = "spawn:noctalia msg volume-mute", allow_when_locked = true }
+"XF86AudioMicMute" = { action = "spawn:wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle", allow_when_locked = true }
+"XF86AudioPlay" = { action = "spawn:playerctl play-pause", allow_when_locked = true }
+"XF86AudioNext" = { action = "spawn:playerctl next", allow_when_locked = true }
+"XF86AudioPrev" = { action = "spawn:playerctl previous", allow_when_locked = true }
+"XF86MonBrightnessUp" = { action = "spawn:noctalia msg brightness-up", allow_when_locked = true }
+"XF86MonBrightnessDown" = { action = "spawn:noctalia msg brightness-down", allow_when_locked = true }
+"Mod+Shift+Escape" = { action = "shortcuts-inhibit-toggle", allow_when_inhibited = true }
+"Ctrl+Alt+Delete" = "session-quit"
+
+"Mod+1" = "workspace-switch:1"
+"Mod+2" = "workspace-switch:2"
+"Mod+3" = "workspace-switch:3"
+"Mod+4" = "workspace-switch:4"
+"Mod+5" = "workspace-switch:5"
+"Mod+6" = "workspace-switch:6"
+"Mod+7" = "workspace-switch:7"
+"Mod+8" = "workspace-switch:8"
+"Mod+9" = "workspace-switch:9"
+"Mod+Ctrl+1" = "column-move-to-workspace:1"
+"Mod+Ctrl+2" = "column-move-to-workspace:2"
+"Mod+Ctrl+3" = "column-move-to-workspace:3"
+"Mod+Ctrl+4" = "column-move-to-workspace:4"
+"Mod+Ctrl+5" = "column-move-to-workspace:5"
+"Mod+Ctrl+6" = "column-move-to-workspace:6"
+"Mod+Ctrl+7" = "column-move-to-workspace:7"
+"Mod+Ctrl+8" = "column-move-to-workspace:8"
+"Mod+Ctrl+9" = "column-move-to-workspace:9"
+
+[[window_rule]]
+match.app_id = "^dev.noctalia.Noctalia$"
+default_floating = true
+default_floating_size_px = { width = 1020, height = 900 }
+
+[[window_rule]]
+match.app_id = "^dev.noctalia.UmbrielSharePicker$"
+default_floating = true
+default_floating_size_px = { width = 800, height = 600 }
+
+[[window_rule]]
+match.app_id = "^steam$"
+match.title = "^notificationtoasts_.+_desktop$"
+default_position = { x = 10, y = 10, anchor = "bottom_right" }
+default_focused = false
+
+[[window_rule]]
+match.app_id = "^(it.mijorus.smile|satty)$"
+default_floating = true
+
+[[layer_rule]]
+match.namespace = "^noctalia-(bar-[^\"]+|notification|dock|panel|attached-panel|osd|desktop-widget-[^\"]*)$"
+blur = true
+blur_ignore_alpha = 0.5
+blur_optimized = false

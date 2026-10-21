@@ -38,10 +38,10 @@
                     }
                 }
             ],
-            "ghcr.io/crispywaffles666/bazzite-niri": [
+            "ghcr.io/crispywaffles666/bazzite-noctalia": [
                 {
                     "type": "sigstoreSigned",
-                    "keyPath": "/etc/pki/containers/ghcr.io-crispywaffles666-bazzite-niri.pub",
+                    "keyPath": "/etc/pki/containers/ghcr.io-crispywaffles666-bazzite-noctalia.pub",
                     "signedIdentity": {
                         "type": "matchRepository"
                     }

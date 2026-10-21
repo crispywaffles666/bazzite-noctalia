@@ -1,7 +1,7 @@
 ---
 # yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
-name: bazzite-niri
-description: Bazzite with GNOME stripped, niri compositor + noctalia shell
+name: bazzite-noctalia
+description: Bazzite gaming image with Umbriel, Noctalia Shell and Noctalia Greeter
 
 base-image: ghcr.io/ublue-os/bazzite-gnome
 image-version: stable
@@ -26,17 +26,14 @@ stages:
 modules:
   # Fresh mutable RPM inputs on every build (including scheduled builds).
   # Only the isolated, pinned theme/font stage uses persistent cache hits.
-  # Mark the portal and keyring as user-picked so autoremove keeps them.
+  # Mark GTK portal and keyring as user-picked so autoremove keeps them.
   - type: dnf
     no-cache: true
     install:
       packages:
-        - niri
-        - xwayland-satellite
         - greetd
-        - tuigreet
         - alacritty
-        - xdg-desktop-portal-gnome
+        - xdg-desktop-portal-gtk
         - gnome-keyring
         # pam_gnome_keyring.so unlocks the login keyring through greetd. GDM
         # pulls this package in today, so removing GDM would let autoremove
@@ -45,7 +42,7 @@ modules:
         # Removing GNOME add-ons would also drop Nautilus.
         - nautilus
       exclude:
-        # Noctalia replaces Niri's suggested bar, launcher, and lock screen.
+        # Noctalia supplies the bar, launcher, and lock screen.
         - swaylock
         - waybar
         - fuzzel
@@ -59,7 +56,10 @@ modules:
   - type: dnf
     install:
       packages:
+        - umbriel-nightly
         - noctalia
+        - noctalia-greeter
+        - xdg-desktop-portal-umbriel-nightly
         - ghostty
         - satty
         - brightnessctl
@@ -70,7 +70,7 @@ modules:
         - keyd
         # The screenshot tools call wl-copy, but no package pulls it in.
         - wl-clipboard
-        # Smile's GNOME-only add-on cannot paste under Niri, so the wrapper
+        # Smile's GNOME-only add-on cannot paste under Umbriel, so the wrapper
         # uses wtype.
         - wtype
         - pavucontrol
@@ -166,7 +166,7 @@ modules:
       - dnf5 config-manager setopt terra.enabled=0
       - dnf5 config-manager setopt brave-browser.enabled=0
 
-  # Fail if upstream package changes restore GNOME or break Niri.
+  # Fail if upstream package changes restore GNOME or break Umbriel.
   - type: script
     scripts:
       - validate-package-set.sh

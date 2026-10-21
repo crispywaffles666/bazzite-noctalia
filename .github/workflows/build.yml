@@ -1,4 +1,4 @@
-name: bluebuild
+name: bazzite-noctalia
 on:
   schedule:
     - cron:
@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   bluebuild:
-    name: Build Custom Image
+    name: Build bazzite-noctalia
     runs-on: ubuntu-latest
     permissions:
       contents: read
