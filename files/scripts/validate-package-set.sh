@@ -33,6 +33,10 @@ for pkg in "${required[@]}"; do
     fi
 done
 
+# Record which Umbriel snapshot this image ships; install-rebuilt-umbriel.sh
+# logs whether it is the F44 rebuild or Terra's F44 fallback.
+echo "Shipping $(rpm -q umbriel-nightly)"
+
 for pkg in "${banned[@]}"; do
     if rpm -q --quiet "$pkg"; then
         echo "ERROR: forbidden desktop package is installed: $pkg" >&2
