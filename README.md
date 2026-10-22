@@ -25,7 +25,7 @@ The image uses two main portal backends: `xdg-desktop-portal-gtk` for general in
 
 **Current Terra RPM caveat:** `umbriel-nightly` still declares `xwayland-satellite` as a hard dependency, although the installed binary uses wlroots native Xwayland. Satellite is installed transitively but is never started by the Umbriel config. The image removes it automatically once Terra drops that obsolete RPM requirement, avoiding a broken dependency graph in the meantime.
 
-Fedora's greetd RPM creates the **`greetd`** account. The greeter runs as that account; tmpfiles and a service prestart create `/var/lib/noctalia-greeter` and its initial settings on each boot, because bootc does not ship `/var`. A second prestart copies the [greeter display and clock settings](files/system/etc/noctalia-greeter/greeter.toml) into its state directory. The greeter uses Breezy's portrait rotation and placement, scale 1, and a 12-hour clock. The existing Fedora greetd PAM stack includes `system-auth` and `pam_gnome_keyring.so`.
+Fedora's greetd RPM creates the **`greetd`** account. The greeter runs as that account; tmpfiles and a service prestart create `/var/lib/noctalia-greeter` and its initial settings on each boot, because bootc does not ship `/var`. The image labels that directory `xdm_var_lib_t`, like `/var/lib/greetd`, so SELinux lets the greeter remember the scheme and session picked there. A second prestart copies the [greeter display and clock settings](files/system/etc/noctalia-greeter/greeter.toml) into its state directory. The greeter uses Breezy's portrait rotation and placement, scale 1, and a 12-hour clock. The existing Fedora greetd PAM stack includes `system-auth` and `pam_gnome_keyring.so`.
 
 ## First switch and signatures
 

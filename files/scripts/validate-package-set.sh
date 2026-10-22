@@ -161,6 +161,7 @@ grep -Fxq 'command = "/usr/bin/noctalia-greeter-session -- --session Umbriel"' /
 grep -Fxq 'user = "greetd"' /etc/greetd/config.toml || fail "greetd greeter user changed"
 getent passwd greetd >/dev/null || fail "Fedora greetd account missing"
 grep -Eq '^d /var/lib/noctalia-greeter 0750 greetd greetd ' /usr/lib/tmpfiles.d/noctalia-greeter.conf || fail "greeter state tmpfiles rule missing"
+[[ "$(matchpathcon -n /var/lib/noctalia-greeter/sync.toml)" == *:xdm_var_lib_t:* ]] || fail "greeter state is not labeled for the greeter to write"
 grep -Eq '^auth[[:space:]]+substack[[:space:]]+system-auth' /etc/pam.d/greetd || fail "greetd PAM system-auth missing"
 grep -Eq '^session[[:space:]]+include[[:space:]]+system-auth' /etc/pam.d/greetd || fail "greetd PAM systemd session path missing"
 grep -Eq '^[-]?auth[[:space:]]+optional[[:space:]]+pam_gnome_keyring.so' /etc/pam.d/greetd || fail "greetd PAM keyring unlock missing"
