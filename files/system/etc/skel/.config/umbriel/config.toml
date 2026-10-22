@@ -1,7 +1,7 @@
 # Starter configuration for bazzite-noctalia. Umbriel's native session starts
 # through /usr/share/wayland-sessions/umbriel.desktop (Exec=start-umbriel).
 [general]
-autostart = ["noctalia", "$HOME/.local/bin/screenshot-notify.sh", "$HOME/.local/bin/umbriel-auto-fullwidth.py"]
+autostart = ["noctalia", "$HOME/.local/bin/screenshot-notify.sh", "$HOME/.local/bin/umbriel-auto-fullwidth.py", "$HOME/.local/bin/umbriel-overview-autoclose.py"]
 xwayland = true
 xwayland_native_resolution = true
 show_cheatsheet = false
