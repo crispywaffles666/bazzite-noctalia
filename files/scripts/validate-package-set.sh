@@ -33,6 +33,14 @@ for pkg in "${required[@]}"; do
     fi
 done
 
+# Terra's abandoned noctalia RPM outranks Fedora's under Bazzite's Terra
+# priority. Typing in the overview to open the launcher needs 5.2.0 or newer.
+noctalia_version=$(rpm -q --qf '%{VERSION}' noctalia)
+if [[ $(rpm --eval "%{lua: print(rpm.vercmp('$noctalia_version', '5.2.0'))}") -lt 0 ]]; then
+    echo "ERROR: noctalia $noctalia_version is older than Fedora's; Terra's stale RPM won" >&2
+    exit 1
+fi
+
 # Record which Umbriel snapshot this image ships; install-rebuilt-umbriel.sh
 # logs whether it is the F44 rebuild or Terra's F44 fallback.
 echo "Shipping $(rpm -q umbriel-nightly)"

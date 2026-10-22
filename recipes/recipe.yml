@@ -57,6 +57,9 @@ modules:
         - gnome-keyring-pam
         # Removing GNOME add-ons would also drop Nautilus.
         - nautilus
+        # Fedora packages Noctalia now. Bazzite gives Terra priority=1, so a
+        # Terra-enabled install would pick its abandoned 5.0.0~beta.9 RPM.
+        - noctalia
       exclude:
         # Noctalia supplies the bar, launcher, and lock screen.
         - swaylock
@@ -73,7 +76,6 @@ modules:
     install:
       packages:
         - umbriel-nightly
-        - noctalia
         - noctalia-greeter
         - xdg-desktop-portal-umbriel-nightly
         - ghostty

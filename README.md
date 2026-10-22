@@ -17,7 +17,7 @@ Noctalia's [starter config](files/system/etc/skel/.config/noctalia/config.toml) 
 
 Window moves use a spring curve, and Umbriel's drag physics adds motion and settling when a window is dragged into place.
 
-`Mod+Space` opens Umbriel's overview. `Alt+Space` and `Mod+S` open Noctalia's launcher directly. Terra currently ships Noctalia 5.0.0-beta.9, which does not support typing in Umbriel's overview to open the launcher; upstream added that in 5.2.0.
+`Mod+Space` opens Umbriel's overview. `Alt+Space` and `Mod+S` open Noctalia's launcher directly. Typing in Umbriel's overview opens the launcher, which needs Noctalia 5.2.0 or newer. The image installs Noctalia from Fedora before Terra is enabled: Terra dropped its package once Fedora took it over, and Bazzite's Terra priority would otherwise select Terra's leftover 5.0.0-beta.9 RPM.
 
 VRR and HDR require supported hardware and are opt-in per output in the Umbriel config. See the commented `[output.DP-1]` example and [Umbriel's output documentation](https://docs.noctalia.dev/umbriel/outputs/). Fullscreen, direct scanout, multi-monitor placement, and native Xwayland use Umbriel's own implementation. Screen sharing uses the Umbriel portal.
 
