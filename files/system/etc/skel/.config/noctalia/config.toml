@@ -156,7 +156,6 @@ show_dots            = true
 show_instance_count  = false
 launcher_position    = "end"
 active_monitor_only  = true
-monitors             = []
 pinned               = ["com.mitchellh.ghostty", "com.brave.Browser"]
 
 # ── Notifications ──
