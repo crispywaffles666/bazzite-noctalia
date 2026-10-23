@@ -147,6 +147,9 @@ rm -rf "$test_home"
 python3 -c 'import ast, pathlib; ast.parse(pathlib.Path("/etc/skel/.local/bin/umbriel-auto-fullwidth.py").read_text())' || fail "Umbriel column-width helper has invalid Python syntax"
 [[ -x /etc/skel/.local/bin/umbriel-overview-autoclose.py ]] || fail "Umbriel overview auto-close helper missing"
 python3 -c 'import ast, pathlib; ast.parse(pathlib.Path("/etc/skel/.local/bin/umbriel-overview-autoclose.py").read_text())' || fail "Umbriel overview auto-close helper has invalid Python syntax"
+[[ -x /etc/skel/.local/bin/umbriel-xwayland-primary.py ]] || fail "Umbriel Xwayland primary output helper missing"
+python3 -c 'import ast, pathlib; ast.parse(pathlib.Path("/etc/skel/.local/bin/umbriel-xwayland-primary.py").read_text())' || fail "Umbriel Xwayland primary output helper has invalid Python syntax"
+command -v xrandr >/dev/null || fail "xrandr missing for the Xwayland primary output helper"
 python3 -c 'import json, pathlib; json.loads(pathlib.Path("/etc/skel/.config/umbriel/output-widths.json").read_text())' || fail "Umbriel output widths are invalid JSON"
 
 # Check the exact greeter executable, account, state path, and PAM/keyring

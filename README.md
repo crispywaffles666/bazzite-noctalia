@@ -11,7 +11,7 @@ Bazzite's gaming foundation with the GNOME desktop stack replaced by the Noctali
 
 ## Desktop and session
 
-The Terra RPM supplies `/usr/share/wayland-sessions/umbriel.desktop` with `Exec=start-umbriel`. Noctalia Greeter selects **Umbriel** by default. The starter [Umbriel config](files/system/etc/skel/.config/umbriel/config.toml) autostarts Noctalia and a helper that closes the overview when a window opens, and preserves the original image's Dracula colors, scrolling layout, common keybinds, and Screenshot notifier. Umbriel supplies Xwayland internally; Bazzite's existing Terra Xwayland package provides its server binary.
+The Terra RPM supplies `/usr/share/wayland-sessions/umbriel.desktop` with `Exec=start-umbriel`. Noctalia Greeter selects **Umbriel** by default. The starter [Umbriel config](files/system/etc/skel/.config/umbriel/config.toml) autostarts Noctalia, a helper that closes the overview when a window opens, and a helper that makes the largest landscape monitor primary in Xwayland so X11 and Proton games pick its resolutions instead of a rotated monitor's, and preserves the original image's Dracula colors, scrolling layout, common keybinds, and Screenshot notifier. Umbriel supplies Xwayland internally; Bazzite's existing Terra Xwayland package provides its server binary.
 
 Noctalia's [starter config](files/system/etc/skel/.config/noctalia/config.toml) keeps the source image's shell look and functionality. Noctalia handles screenshots and saves them to `~/Pictures/Screenshots`. The included app configs and helper scripts are otherwise inherited from `bazzite-niri`.
 
