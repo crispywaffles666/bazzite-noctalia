@@ -27,6 +27,8 @@ The image uses two main portal backends: `xdg-desktop-portal-gtk` for general in
 
 Fedora's greetd RPM creates the **`greetd`** account. The greeter runs as that account; tmpfiles and a service prestart create `/var/lib/noctalia-greeter` and its initial settings on each boot, because bootc does not ship `/var`. The image labels that directory `xdm_var_lib_t`, like `/var/lib/greetd`, so SELinux lets the greeter remember the scheme and session picked there. A second prestart copies the [greeter display and clock settings](files/system/etc/noctalia-greeter/greeter.toml) into its state directory. The greeter uses Breezy's portrait rotation and placement, scale 1, and a 12-hour clock. The existing Fedora greetd PAM stack includes `system-auth` and `pam_gnome_keyring.so`.
 
+Like `bazzite-niri`, the machine suspends after 15 idle minutes at the greeter. logind's `IdleAction` cannot do this here: libseat switches the greeter's session to type `wayland`, and logind then waits for an idle hint the greeter never sets. Instead the greeter blanks its outputs after 10 minutes without input, and [`greeter-idle-suspend`](files/system/usr/libexec/greeter-idle-suspend) suspends once they have stayed blank for 5 more. Noctalia still handles idle suspend after login.
+
 ## First switch and signatures
 
 The new repository must have an Actions secret named `SIGNING_SECRET` containing the private cosign key matching the committed `cosign.pub`. The public key is copied from the source image; you may reuse its private key in this separate repository or generate a new pair and update `cosign.pub` plus `files/system/etc/pki/containers/ghcr.io-crispywaffles666-bazzite-noctalia.pub` together. The workflow publishes signed images only from `main`.

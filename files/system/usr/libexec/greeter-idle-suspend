@@ -1,0 +1,45 @@
+#!/usr/bin/bash
+# Suspend after Noctalia Greeter has blanked its outputs for GRACE seconds.
+#
+# logind's IdleAction cannot see greeter idle here: libseat switches the
+# greeter session to type wayland, and logind then waits for an idle hint the
+# greeter never sets. The greeter compositor blanks every output after its
+# [idle] timeout and restores them on input, so blank outputs mean idle.
+set -u
+
+grace=${GREETER_SUSPEND_GRACE:-300}
+interval=30
+dark=0
+
+greeter_active() {
+    local s
+    s=$(loginctl show-seat seat0 -p ActiveSession --value 2>/dev/null) || return 1
+    [[ -n $s ]] && [[ $(loginctl show-session "$s" -p Class --value 2>/dev/null) == greeter ]]
+}
+
+outputs_dark() {
+    local c connected=0
+    for c in /sys/class/drm/card*-*; do
+        [[ $(<"$c/status") == connected ]] || continue
+        connected=1
+        [[ $(<"$c/enabled") == disabled ]] || return 1
+    done 2>/dev/null
+    ((connected))
+}
+
+last=$EPOCHSECONDS
+while sleep "$interval"; do
+    now=$EPOCHSECONDS
+    # A long gap means the system just resumed; restart the grace period.
+    if ((now - last > interval * 2)) || ! greeter_active || ! outputs_dark; then
+        dark=0
+    else
+        ((dark += interval))
+    fi
+    last=$now
+    if ((dark >= grace)); then
+        echo "Greeter outputs blank for ${dark}s; suspending."
+        systemctl suspend
+        dark=0
+    fi
+done

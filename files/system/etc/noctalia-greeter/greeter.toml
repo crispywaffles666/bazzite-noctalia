@@ -9,3 +9,8 @@ use_synced_settings = false
 layout = "DP-4:0,184; DP-3:2560,0"
 transforms = "DP-4:normal; DP-3:270"
 scales = "DP-4:1; DP-3:1"
+
+[idle]
+# Blank the outputs after 10 minutes without input. greeter-idle-suspend then
+# suspends once they stay blank for 5 more, matching the old 15-minute rule.
+timeout = 600

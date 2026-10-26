@@ -1,0 +1,11 @@
+[Unit]
+Description=Suspend when idle at Noctalia Greeter
+After=greetd.service
+PartOf=greetd.service
+
+[Service]
+ExecStart=/usr/libexec/greeter-idle-suspend
+Restart=on-failure
+
+[Install]
+WantedBy=greetd.service
