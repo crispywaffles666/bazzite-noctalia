@@ -1,12 +1,25 @@
 #!/bin/bash
 # Smile can only copy on Wayland. Type its pick once Umbriel restores focus.
 
-baseline="$(wl-paste --no-newline 2>/dev/null)"
+# Count clipboard copies while Smile is open. Comparing text would miss
+# picking the emoji that is already on the clipboard.
+copies="$(mktemp)"
+trap 'kill "$watcher" 2>/dev/null; rm -f "$copies"' EXIT
+wl-paste --watch sh -c 'echo >> "$1"' sh "$copies" &
+watcher=$!
+
+# The watcher reports the current clipboard once on start.
+for _ in $(seq 20); do
+    [ -s "$copies" ] && break
+    sleep 0.05
+done
+started="$(wc -l < "$copies")"
 
 flatpak run it.mijorus.smile
+sleep 0.1 # Let the watcher see Smile's copy.
 
 pick="$(wl-paste --no-newline 2>/dev/null)"
-if [ -z "$pick" ] || [ "$pick" = "$baseline" ]; then
+if [ "$(wc -l < "$copies")" -le "$started" ] || [ -z "$pick" ]; then
     exit 0
 fi
 
