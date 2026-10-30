@@ -19,7 +19,7 @@ sleep 0.15 # Wait for Umbriel to restore focus.
 
 # Chromium apps ignore wtype's Unicode keys. Use Ctrl+V there, but not in
 # terminals, where Ctrl+V means "insert the next key as text."
-app_id="$(umbriel windows --json 2>/dev/null | jq -r '.[] | select(.focused == true) | .app_id' 2>/dev/null | head -n 1)"
+app_id="$(umbriel windows --json 2>/dev/null | jq -r '.[] | select(.active == true) | .app_id' 2>/dev/null | head -n 1)"
 shopt -s nocasematch
 case "$app_id" in
     *brave*|*chrom*|*edge*|*vivaldi*|*opera*)
