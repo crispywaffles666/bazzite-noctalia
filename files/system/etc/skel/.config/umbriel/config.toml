@@ -111,17 +111,17 @@ default_extent_fraction = 1.0
 # hdr = "auto"
 
 [keybinds]
-"Mod+Return" = "spawn:alacritty"
-"Super+Backslash" = "spawn:ghostty"
-"Mod+B" = "spawn:brave-origin"
-"Mod+E" = "spawn:nautilus"
-"Mod+Period" = "spawn:$HOME/.local/bin/smile-paste.sh"
+"Mod+Return" = "spawn alacritty"
+"Super+Backslash" = "spawn ghostty"
+"Mod+B" = "spawn brave-origin"
+"Mod+E" = "spawn nautilus"
+"Mod+Period" = "spawn $HOME/.local/bin/smile-paste.sh"
 "Mod+Q" = "window-close"
-"Mod+Shift+Q" = "spawn:noctalia msg panel-toggle session"
-"Mod+Alt+L" = "spawn:loginctl lock-session"
+"Mod+Shift+Q" = "spawn noctalia msg panel-toggle session"
+"Mod+Alt+L" = "spawn loginctl lock-session"
 "Mod+Space" = { action = "overview-toggle", repeat = false }
-"Mod+S" = "spawn:noctalia msg panel-toggle launcher"
-"Alt+Space" = "spawn:noctalia msg panel-toggle launcher"
+"Mod+S" = "spawn noctalia msg panel-toggle launcher"
+"Alt+Space" = "spawn noctalia msg panel-toggle launcher"
 "Mod+O" = "overview-toggle"
 "Mod+F" = "window-toggle-fullscreen"
 "Mod+T" = "window-toggle-floating"
@@ -171,47 +171,47 @@ default_extent_fraction = 1.0
 "Mod+Ctrl+F" = "window-toggle-maximize"
 "Mod+BracketLeft" = "window-consume-or-expel-left"
 "Mod+BracketRight" = "window-consume-or-expel-right"
-"Mod+Minus" = "window-modify-primary-extent:-0.1"
-"Mod+Equal" = "window-modify-primary-extent:+0.1"
-"Mod+Shift+Minus" = "window-modify-secondary-extent:-0.1"
-"Mod+Shift+Equal" = "window-modify-secondary-extent:+0.1"
-"Print" = "spawn:noctalia msg screenshot-region"
-"Ctrl+Shift+2" = "spawn:noctalia msg screenshot-fullscreen pick"
+"Mod+Minus" = "window-modify-primary-extent -0.1"
+"Mod+Equal" = "window-modify-primary-extent +0.1"
+"Mod+Shift+Minus" = "window-modify-secondary-extent -0.1"
+"Mod+Shift+Equal" = "window-modify-secondary-extent +0.1"
+"Print" = "spawn noctalia msg screenshot-region"
+"Ctrl+Shift+2" = "spawn noctalia msg screenshot-fullscreen pick"
 # Noctalia v5 has no window-only screenshot command; select its region instead.
-"Ctrl+Shift+3" = "spawn:noctalia msg screenshot-region"
-"XF86AudioRaiseVolume" = { action = "spawn:noctalia msg volume-up", allow_when_locked = true }
-"XF86AudioLowerVolume" = { action = "spawn:noctalia msg volume-down", allow_when_locked = true }
-"XF86AudioMute" = { action = "spawn:noctalia msg volume-mute", allow_when_locked = true }
-"XF86AudioMicMute" = { action = "spawn:wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle", allow_when_locked = true }
-"XF86AudioPlay" = { action = "spawn:playerctl play-pause", allow_when_locked = true }
-"XF86AudioPause" = { action = "spawn:playerctl play-pause", allow_when_locked = true }
-"XF86AudioNext" = { action = "spawn:playerctl next", allow_when_locked = true }
-"XF86AudioPrev" = { action = "spawn:playerctl previous", allow_when_locked = true }
-"XF86MonBrightnessUp" = { action = "spawn:noctalia msg brightness-up", allow_when_locked = true }
-"XF86MonBrightnessDown" = { action = "spawn:noctalia msg brightness-down", allow_when_locked = true }
+"Ctrl+Shift+3" = "spawn noctalia msg screenshot-region"
+"XF86AudioRaiseVolume" = { action = "spawn noctalia msg volume-up", allow_when_locked = true }
+"XF86AudioLowerVolume" = { action = "spawn noctalia msg volume-down", allow_when_locked = true }
+"XF86AudioMute" = { action = "spawn noctalia msg volume-mute", allow_when_locked = true }
+"XF86AudioMicMute" = { action = "spawn wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle", allow_when_locked = true }
+"XF86AudioPlay" = { action = "spawn playerctl play-pause", allow_when_locked = true }
+"XF86AudioPause" = { action = "spawn playerctl play-pause", allow_when_locked = true }
+"XF86AudioNext" = { action = "spawn playerctl next", allow_when_locked = true }
+"XF86AudioPrev" = { action = "spawn playerctl previous", allow_when_locked = true }
+"XF86MonBrightnessUp" = { action = "spawn noctalia msg brightness-up", allow_when_locked = true }
+"XF86MonBrightnessDown" = { action = "spawn noctalia msg brightness-down", allow_when_locked = true }
 "Mod+Shift+Escape" = "cheatsheet-toggle"
 "Mod+Escape" = { action = "shortcuts-inhibit-toggle", allow_when_inhibited = true, repeat = false }
 "Ctrl+Alt+Delete" = "session-quit"
 "Mod+Shift+P" = "dpms-off"
 
-"Mod+1" = 'workspace-switch:"1"/DP-4'
-"Mod+2" = 'workspace-switch:"2"/DP-4'
-"Mod+3" = 'workspace-switch:"3"/DP-4'
-"Mod+4" = 'workspace-switch:"4"/DP-3'
-"Mod+5" = 'workspace-switch:"5"/DP-3'
-"Mod+6" = "workspace-switch:6"
-"Mod+7" = "workspace-switch:7"
-"Mod+8" = "workspace-switch:8"
-"Mod+9" = "workspace-switch:9"
-"Mod+Ctrl+1" = 'column-move-to-workspace:"1"/DP-4'
-"Mod+Ctrl+2" = 'column-move-to-workspace:"2"/DP-4'
-"Mod+Ctrl+3" = 'column-move-to-workspace:"3"/DP-4'
-"Mod+Ctrl+4" = 'column-move-to-workspace:"4"/DP-3'
-"Mod+Ctrl+5" = 'column-move-to-workspace:"5"/DP-3'
-"Mod+Ctrl+6" = "column-move-to-workspace:6"
-"Mod+Ctrl+7" = "column-move-to-workspace:7"
-"Mod+Ctrl+8" = "column-move-to-workspace:8"
-"Mod+Ctrl+9" = "column-move-to-workspace:9"
+"Mod+1" = "workspace-switch --name 1 --output DP-4"
+"Mod+2" = "workspace-switch --name 2 --output DP-4"
+"Mod+3" = "workspace-switch --name 3 --output DP-4"
+"Mod+4" = "workspace-switch --name 4 --output DP-3"
+"Mod+5" = "workspace-switch --name 5 --output DP-3"
+"Mod+6" = "workspace-switch 6"
+"Mod+7" = "workspace-switch 7"
+"Mod+8" = "workspace-switch 8"
+"Mod+9" = "workspace-switch 9"
+"Mod+Ctrl+1" = "column-move-to-workspace --name 1 --output DP-4"
+"Mod+Ctrl+2" = "column-move-to-workspace --name 2 --output DP-4"
+"Mod+Ctrl+3" = "column-move-to-workspace --name 3 --output DP-4"
+"Mod+Ctrl+4" = "column-move-to-workspace --name 4 --output DP-3"
+"Mod+Ctrl+5" = "column-move-to-workspace --name 5 --output DP-3"
+"Mod+Ctrl+6" = "column-move-to-workspace 6"
+"Mod+Ctrl+7" = "column-move-to-workspace 7"
+"Mod+Ctrl+8" = "column-move-to-workspace 8"
+"Mod+Ctrl+9" = "column-move-to-workspace 9"
 
 [[window_rule]]
 match.app_id = "^dev.noctalia.Noctalia$"

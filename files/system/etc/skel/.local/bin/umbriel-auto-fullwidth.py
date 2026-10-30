@@ -41,7 +41,7 @@ def apply_width(window_id, output_name, extents):
     windows = run_json("windows", "--json")
     if not any(item["id"] == window_id and item["focused"] and not item["floating"] for item in windows):
         return
-    subprocess.run(("umbriel", "msg", f"window-set-primary-extent:{fraction:g}"), check=True)
+    subprocess.run(("umbriel", "msg", "window-set-primary-extent", f"{fraction:g}"), check=True)
 
 
 def follow(extents):
