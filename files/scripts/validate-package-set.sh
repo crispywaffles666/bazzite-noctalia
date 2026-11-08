@@ -165,10 +165,15 @@ grep -Fxq 'user = "greetd"' /etc/greetd/config.toml || fail "greetd greeter user
 getent passwd greetd >/dev/null || fail "Fedora greetd account missing"
 grep -Eq '^d /var/lib/noctalia-greeter 0750 greetd greetd ' /usr/lib/tmpfiles.d/noctalia-greeter.conf || fail "greeter state tmpfiles rule missing"
 [[ "$(matchpathcon -n /var/lib/noctalia-greeter/sync.toml)" == *:xdm_var_lib_t:* ]] || fail "greeter state is not labeled for the greeter to write"
-grep -Eq '^auth[[:space:]]+substack[[:space:]]+system-auth' /etc/pam.d/greetd || fail "greetd PAM system-auth missing"
-grep -Eq '^session[[:space:]]+include[[:space:]]+system-auth' /etc/pam.d/greetd || fail "greetd PAM systemd session path missing"
-grep -Eq '^[-]?auth[[:space:]]+optional[[:space:]]+pam_gnome_keyring.so' /etc/pam.d/greetd || fail "greetd PAM keyring unlock missing"
-grep -Eq '^[-]?session[[:space:]]+optional[[:space:]]+pam_gnome_keyring.so auto_start' /etc/pam.d/greetd || fail "greetd PAM keyring startup missing"
+# Fedora 45 moved vendor PAM configs to /usr/lib/pam.d. A local /etc override
+# takes precedence, so validate the stack greetd will actually use.
+greetd_pam=/usr/lib/pam.d/greetd
+[[ ! -e /etc/pam.d/greetd ]] || greetd_pam=/etc/pam.d/greetd
+[[ -r "$greetd_pam" ]] || fail "greetd PAM configuration missing"
+grep -Eq '^auth[[:space:]]+substack[[:space:]]+system-auth' "$greetd_pam" || fail "greetd PAM system-auth missing"
+grep -Eq '^session[[:space:]]+include[[:space:]]+system-auth' "$greetd_pam" || fail "greetd PAM systemd session path missing"
+grep -Eq '^[-]?auth[[:space:]]+optional[[:space:]]+pam_gnome_keyring.so' "$greetd_pam" || fail "greetd PAM keyring unlock missing"
+grep -Eq '^[-]?session[[:space:]]+optional[[:space:]]+pam_gnome_keyring.so auto_start' "$greetd_pam" || fail "greetd PAM keyring startup missing"
 greeter_admin=/etc/noctalia-greeter/greeter.toml
 [[ -r "$greeter_admin" ]] || fail "Noctalia Greeter administrator config missing"
 python3 -c 'import tomllib,sys; c=tomllib.load(open(sys.argv[1],"rb")); assert c["clock"]["time_format"] == "%I:%M %p"; assert c["output"]["layout"] == "DP-4:0,184; DP-3:2560,0"; assert c["output"]["transforms"] == "DP-4:normal; DP-3:270"; assert c["output"]["scales"] == "DP-4:1; DP-3:1"' "$greeter_admin" || fail "Noctalia Greeter display or 12-hour clock settings invalid"
