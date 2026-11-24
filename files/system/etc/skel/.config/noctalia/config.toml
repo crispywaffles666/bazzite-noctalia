@@ -13,7 +13,6 @@ telemetry_enabled     = false
 avatar_path           = "~/.face"
 password_style        = "default"
 clipboard_enabled     = true
-app_icon_colorize     = false
 
 [shell.screenshot]
 save_to_file      = true
